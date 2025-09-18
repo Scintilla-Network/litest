@@ -38,13 +38,13 @@ Note: Some features are not implemented yet, ultra early stage of development. F
 ## Installation
 
 ```bash
-npm install --save-dev litest
+npm install --save-dev @scintilla-network/litest
 ```
 
 Or for global installation (I would not recommend this):
 
 ```bash
-npm install -g litest
+npm install -g @scintilla-network/litest
 ```
 
 ## Usage
@@ -52,7 +52,7 @@ npm install -g litest
 ### Basic Test Structure
 
 ```javascript
-import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach } from 'litest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, afterEach } from '@scintilla-network/litest';
 
 describe('My Test Suite', () => {
     beforeAll(() => {
@@ -94,7 +94,7 @@ describe('My Test Suite', () => {
 #### Test Modifiers and Configuration
 
 ```javascript
-import { describe, it, test, expect } from 'litest';
+import { describe, it, test, expect } from '@scintilla-network/litest';
 
 describe('Advanced Features', () => {
     // Test aliases
@@ -173,7 +173,7 @@ describe.each([
 
 
 ```javascript
-import { onTestFinished, onTestFailed } from 'litest';
+import { onTestFinished, onTestFailed } from '@scintilla-network/litest';
 
 describe('Test Hooks', () => {
     it('should cleanup resources', () => {
@@ -388,7 +388,7 @@ Tests have a default timeout of 5 seconds (5000ms).
 Use `setTestTimeout()` to configure timeout for tests in the current suite:
 
 ```javascript
-import { describe, it, expect, setTestTimeout } from 'litest';
+import { describe, it, expect, setTestTimeout } from '@scintilla-network/litest';
 
 describe('API Tests', () => {
     // Set timeout to 10 seconds for slow API calls
@@ -444,7 +444,7 @@ it.only('only this test', () => {
 ## Example
 
 ```javascript
-import { describe, it, expect } from 'litest';
+import { describe, it, expect } from '@scintilla-network/litest';
 
 describe('Array Operations', () => {
     describe('push method', () => {
@@ -520,7 +520,7 @@ Litest provides API compatibility with Vitest for common use cases. Migration sh
 npm uninstall vitest
 
 # Install Litest
-npm install --save-dev litest
+npm install --save-dev @scintilla-network/litest
 ```
 
 ### Update Import Statements
@@ -530,7 +530,7 @@ npm install --save-dev litest
 import { describe, it, test, expect, beforeAll, beforeEach, afterAll, afterEach } from 'vitest';
 
 // After (Litest) - exact same API
-import { describe, it, test, expect, beforeAll, beforeEach, afterAll, afterEach } from 'litest';
+import { describe, it, test, expect, beforeAll, beforeEach, afterAll, afterEach } from '@scintilla-network/litest';
 ```
 
 ### Supported Vitest Features
@@ -555,7 +555,7 @@ import { describe, it, test, expect, beforeAll, beforeEach, afterAll, afterEach 
 
 ```javascript
 // This Vitest test file works unchanged with Litest
-import { describe, it, expect, beforeAll, afterAll } from 'litest'; // Changed from 'vitest'
+import { describe, it, expect, beforeAll, afterAll } from '@scintilla-network/litest'; // Changed from 'vitest'
 
 describe('User Service', () => {
   let userService;

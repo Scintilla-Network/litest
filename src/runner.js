@@ -524,15 +524,7 @@ class TestRunner {
 }
 
 // CLI entry point
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    const rawArgs = process.argv.slice(2);
-    const args = parseArgs(rawArgs);
-    
-    // Handle commands that don't require running tests
-    if (handleCommands(args)) {
-        process.exit(0);
-    }
-    
+async function runTests(args) {
     const runner = new TestRunner();
     
     try {
@@ -556,6 +548,29 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
         }
         process.exit(2); // Exit code 2 for fatal errors
     }
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+    const rawArgs = process.argv.slice(2);
+    const args = parseArgs(rawArgs);
+    
+    // Handle commands that don't require running tests
+    if (handleCommands(args)) {
+        process.exit(0);
+    }
+    
+    await runTests(args);
+} else {
+    // Assume we want to check all files in the current directory by calling itself with '.'
+    const rawArgs = process.argv.slice(2);
+    const args = parseArgs(rawArgs);
+    
+    // Handle commands that don't require running tests
+    if (handleCommands(args)) {
+        process.exit(0);
+    }
+    
+    await runTests(args);
 }
 
 export { TestRunner };
