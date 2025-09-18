@@ -1,0 +1,109 @@
+{
+  "name": "@scintilla-network/litest",
+  "version": "1.0.0",
+  "description": "Dependency-free test framework with full Vitest API compatibility. Zero-dependency replacement for Vitest to reduce risk of supply chain attacks.",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "litest": "src/runner.js"
+  },
+  "scripts": {
+    "test": "node src/runner.js",
+    "self-test": "node src/runner.js .",
+    "prepublishOnly": "npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Scintilla-Network/litest.git"
+  },
+  "author": {
+    "name": "Scintilla Network",
+    "url": "https://github.com/Scintilla-Network"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Scintilla-Network/litest/issues"
+  },
+  "homepage": "https://github.com/Scintilla-Network/litest#readme",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/Scintilla-Network"
+  },
+  "keywords": [
+    "test",
+    "testing",
+    "framework",
+    "vitest",
+    "vitest-alternative",
+    "vitest-replacement",
+    "jest",
+    "jest-alternative",
+    "unit-test",
+    "integration-test",
+    "spec",
+    "tdd",
+    "bdd",
+    "describe",
+    "it",
+    "expect",
+    "beforeAll",
+    "beforeEach",
+    "afterAll",
+    "afterEach",
+    "test-runner",
+    "test-framework",
+    "javascript-testing",
+    "nodejs-testing",
+    "esm",
+    "es-modules",
+    "zero-dependency",
+    "no-dependencies",
+    "security",
+    "supply-chain-security",
+    "lightweight",
+    "fast",
+    "simple",
+    "cli",
+    "command-line",
+    "parameterized-testing",
+    "test-hooks",
+    "lifecycle-hooks",
+    "test-timeout",
+    "test-retry",
+    "nested-suites",
+    "test-modifiers",
+    "skip",
+    "only",
+    "fails",
+    "dependency-free"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "import": "./src/index.js",
+      "types": "./src/index.d.ts"
+    }
+  },
+  "directories": {
+    "test": ".",
+    "lib": "src"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64",
+    "arm",
+    "ia32"
+  ]
+}
