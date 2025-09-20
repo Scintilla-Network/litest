@@ -35,6 +35,7 @@ ${c.dim('A simple, fast test framework inspired by Vitest')}
 
 ${c.bold('USAGE')}
   ${c.green('litest')} ${c.dim('[options]')} ${c.dim('[files...]')}
+  ${c.green('litest run')} ${c.dim('[options]')} ${c.dim('[files...]')}
 
 ${c.bold('OPTIONS')}
   ${c.green('-h, --help')}     Show this help message
@@ -44,8 +45,10 @@ ${c.bold('OPTIONS')}
 
 ${c.bold('EXAMPLES')}
   ${c.green('litest')}                    Run all tests in current directory
-  ${c.green('litest test.spec.js')}      Run specific test file
-  ${c.green('litest src/tests/')}        Run all tests in directory
+  ${c.green('litest run')}               Run all tests in current directory
+  ${c.green('litest run test.spec.js')}  Run specific test file
+  ${c.green('litest run src/tests/')}    Run all tests in directory
+  ${c.green('litest test.spec.js')}      Run specific test file (legacy)
   ${c.green('litest *.spec.js')}         Run all spec files matching pattern
 
 ${c.bold('SUPPORTED FILE PATTERNS')}
@@ -81,8 +84,15 @@ function parseArgs(args) {
         coverage: false,
         files: [],
         directories: [],
-        patterns: []
+        patterns: [],
+        command: null // Track if a command was used
     };
+
+    // Handle 'run' subcommand
+    if (args.length > 0 && args[0] === 'run') {
+        parsed.command = 'run';
+        args = args.slice(1); // Remove 'run' from args
+    }
 
     for (let i = 0; i < args.length; i++) {
         const arg = args[i];
