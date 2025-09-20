@@ -46,10 +46,22 @@ function expect(actual, isNegated = false) {
                     beFunction.lessThanOrEqual = (expected) => self.toBeLessThanOrEqual(expected);
                     beFunction.closeTo = (expected, precision) => self.toBeCloseTo(expected, precision);
                     beFunction.instanceOf = (expected) => self.toBeInstanceOf(expected);
-                    beFunction.truthy = () => self.toBeTruthy();
-                    beFunction.falsy = () => self.toBeFalsy();
-                    beFunction.null = () => self.toBeNull();
-                    beFunction.undefined = () => self.toBeUndefined();
+                    // Define getters for immediate execution
+                    Object.defineProperty(beFunction, 'truthy', {
+                        get: () => self.toBeTruthy()
+                    });
+                    Object.defineProperty(beFunction, 'falsy', {
+                        get: () => self.toBeFalsy()
+                    });
+                    Object.defineProperty(beFunction, 'null', {
+                        get: () => self.toBeNull()
+                    });
+                    Object.defineProperty(beFunction, 'undefined', {
+                        get: () => self.toBeUndefined()
+                    });
+                    Object.defineProperty(beFunction, 'defined', {
+                        get: () => self.toBeDefined()
+                    });
                     
                     return beFunction;
                 },
@@ -77,6 +89,9 @@ function expect(actual, isNegated = false) {
                 },
                 get undefined() {
                     return self.toBeUndefined();
+                },
+                get defined() {
+                    return self.toBeDefined();
                 },
                 
                 // Function matchers
@@ -244,6 +259,21 @@ function expect(actual, isNegated = false) {
                 const message = isNegated 
                     ? `Expected ${JSON.stringify(this.actual)} not to be undefined`
                     : `Expected ${JSON.stringify(this.actual)} to be undefined`;
+                throw new Error(message);
+            }
+        },
+
+        /**
+         * Checks if the actual value is defined (not undefined)
+         */
+        toBeDefined() {
+            const isDefined = this.actual !== undefined;
+            const shouldPass = isNegated ? !isDefined : isDefined;
+            
+            if (!shouldPass) {
+                const message = isNegated 
+                    ? `Expected ${JSON.stringify(this.actual)} not to be defined`
+                    : `Expected ${JSON.stringify(this.actual)} to be defined`;
                 throw new Error(message);
             }
         },

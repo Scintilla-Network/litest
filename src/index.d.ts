@@ -14,58 +14,57 @@ export interface TestOptions {
 export type TestFunction = () => void | Promise<void>;
 export type HookFunction = () => void | Promise<void>;
 
-// Main test functions
-export function describe(name: string, fn: () => void): void;
-export function it(name: string, fn: TestFunction): void;
-export function it(name: string, options: TestOptions, fn: TestFunction): void;
-export function test(name: string, fn: TestFunction): void;
-export function test(name: string, options: TestOptions, fn: TestFunction): void;
-export function suite(name: string, fn: () => void): void;
+// Main test functions are declared below with their modifiers
 
 // Test modifiers
-export namespace describe {
-  function skip(name: string, fn: () => void): void;
-  function only(name: string, fn: () => void): void;
-  function todo(name: string, fn?: () => void): void;
-  function skipIf(condition: boolean): (name: string, fn: () => void) => void;
-  function runIf(condition: boolean): (name: string, fn: () => void) => void;
-  function each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
-  function for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
+export interface DescribeModifiers {
+  skip(name: string, fn: () => void): void;
+  only(name: string, fn: () => void): void;
+  todo(name: string, fn?: () => void): void;
+  skipIf(condition: boolean): (name: string, fn: () => void) => void;
+  runIf(condition: boolean): (name: string, fn: () => void) => void;
+  each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
+  for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
 }
 
-export namespace it {
-  function skip(name: string, fn: TestFunction): void;
-  function only(name: string, fn: TestFunction): void;
-  function todo(name: string, fn?: TestFunction): void;
-  function fails(name: string, fn: TestFunction): void;
-  function concurrent(name: string, fn: TestFunction): void;
-  function skipIf(condition: boolean): (name: string, fn: TestFunction) => void;
-  function runIf(condition: boolean): (name: string, fn: TestFunction) => void;
-  function each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
-  function for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
+export interface ItModifiers {
+  skip(name: string, fn: TestFunction): void;
+  only(name: string, fn: TestFunction): void;
+  todo(name: string, fn?: TestFunction): void;
+  fails(name: string, fn: TestFunction): void;
+  concurrent(name: string, fn: TestFunction): void;
+  skipIf(condition: boolean): (name: string, fn: TestFunction) => void;
+  runIf(condition: boolean): (name: string, fn: TestFunction) => void;
+  each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
+  for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
 }
 
-export namespace test {
-  function skip(name: string, fn: TestFunction): void;
-  function only(name: string, fn: TestFunction): void;
-  function todo(name: string, fn?: TestFunction): void;
-  function fails(name: string, fn: TestFunction): void;
-  function concurrent(name: string, fn: TestFunction): void;
-  function skipIf(condition: boolean): (name: string, fn: TestFunction) => void;
-  function runIf(condition: boolean): (name: string, fn: TestFunction) => void;
-  function each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
-  function for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
+export interface TestModifiers {
+  skip(name: string, fn: TestFunction): void;
+  only(name: string, fn: TestFunction): void;
+  todo(name: string, fn?: TestFunction): void;
+  fails(name: string, fn: TestFunction): void;
+  concurrent(name: string, fn: TestFunction): void;
+  skipIf(condition: boolean): (name: string, fn: TestFunction) => void;
+  runIf(condition: boolean): (name: string, fn: TestFunction) => void;
+  each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
+  for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
 }
 
-export namespace suite {
-  function skip(name: string, fn: () => void): void;
-  function only(name: string, fn: () => void): void;
-  function todo(name: string, fn?: () => void): void;
-  function skipIf(condition: boolean): (name: string, fn: () => void) => void;
-  function runIf(condition: boolean): (name: string, fn: () => void) => void;
-  function each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
-  function for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
+export interface SuiteModifiers {
+  skip(name: string, fn: () => void): void;
+  only(name: string, fn: () => void): void;
+  todo(name: string, fn?: () => void): void;
+  skipIf(condition: boolean): (name: string, fn: () => void) => void;
+  runIf(condition: boolean): (name: string, fn: () => void) => void;
+  each<T>(cases: T[]): (name: string, fn: (...args: any[]) => void) => void;
+  for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
 }
+
+export declare const describe: ((name: string, fn: () => void) => void) & DescribeModifiers;
+export declare const it: ((name: string, fn: TestFunction) => void) & ItModifiers;
+export declare const test: ((name: string, fn: TestFunction) => void) & TestModifiers;
+export declare const suite: ((name: string, fn: () => void) => void) & SuiteModifiers;
 
 // Chai-style matchers for 'to' property
 export interface ChaiStyleMatchers<T = any> {
@@ -83,6 +82,7 @@ export interface ChaiStyleMatchers<T = any> {
   readonly falsy: void;
   readonly null: void;
   readonly undefined: void;
+  readonly defined: void;
   
   // Function matchers
   throw(expected?: string | RegExp): void;
@@ -92,9 +92,6 @@ export interface ChaiStyleMatchers<T = any> {
   
   // Array/object matchers
   contain(expected: any): void;
-  
-  // Instance matchers
-  readonly instanceOf: (expected: Function) => void;
   
   // Property matchers
   readonly have: {
@@ -124,6 +121,7 @@ export interface Expectation<T = any> {
   toThrow(expected?: string | RegExp): void;
   toBeNull(): void;
   toBeUndefined(): void;
+  toBeDefined(): void;
   toMatch(expected: string | RegExp): void;
   toContain(expected: any): void;
   toHaveProperty(property: string | string[], value?: any): void;
