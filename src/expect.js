@@ -35,9 +35,23 @@ function expect(actual, isNegated = false) {
                     return self.toEqual(expected);
                 },
                 
-                // Simple be matcher (for backwards compatibility)
-                be(expected) {
-                    return self.toBe(expected);
+                // Simple be matcher (for backwards compatibility) with extended properties
+                get be() {
+                    const beFunction = (expected) => self.toBe(expected);
+                    
+                    // Add properties to the function
+                    beFunction.greaterThan = (expected) => self.toBeGreaterThan(expected);
+                    beFunction.greaterThanOrEqual = (expected) => self.toBeGreaterThanOrEqual(expected);
+                    beFunction.lessThan = (expected) => self.toBeLessThan(expected);
+                    beFunction.lessThanOrEqual = (expected) => self.toBeLessThanOrEqual(expected);
+                    beFunction.closeTo = (expected, precision) => self.toBeCloseTo(expected, precision);
+                    beFunction.instanceOf = (expected) => self.toBeInstanceOf(expected);
+                    beFunction.truthy = () => self.toBeTruthy();
+                    beFunction.falsy = () => self.toBeFalsy();
+                    beFunction.null = () => self.toBeNull();
+                    beFunction.undefined = () => self.toBeUndefined();
+                    
+                    return beFunction;
                 },
                 
                 // Deep equality support
@@ -80,6 +94,11 @@ function expect(actual, isNegated = false) {
                     return self.toContain(expected);
                 },
                 
+                // Instance matchers
+                get instanceOf() {
+                    return (expected) => self.toBeInstanceOf(expected);
+                },
+                
                 // Property matchers
                 have: {
                     property(property, value) {
@@ -88,22 +107,6 @@ function expect(actual, isNegated = false) {
                     length(expected) {
                         return self.toHaveLength(expected);
                     }
-                },
-                
-                get greaterThan() {
-                    return (expected) => self.toBeGreaterThan(expected);
-                },
-                get greaterThanOrEqual() {
-                    return (expected) => self.toBeGreaterThanOrEqual(expected);
-                },
-                get lessThan() {
-                    return (expected) => self.toBeLessThan(expected);
-                },
-                get lessThanOrEqual() {
-                    return (expected) => self.toBeLessThanOrEqual(expected);
-                },
-                get closeTo() {
-                    return (expected, precision) => self.toBeCloseTo(expected, precision);
                 }
             };
         },
@@ -475,6 +478,40 @@ function expect(actual, isNegated = false) {
                 const message = isNegated 
                     ? `Expected ${this.actual} not to be close to ${expected} (precision: ${precision})`
                     : `Expected ${this.actual} to be close to ${expected} (precision: ${precision})`;
+                throw new Error(message);
+            }
+        },
+
+        /**
+         * Checks if the actual value is an instance of the expected constructor
+         * @param {Function} expected - The expected constructor/class
+         */
+        toBeInstanceOf(expected) {
+            if (typeof expected !== 'function') {
+                throw new Error('toBeInstanceOf requires a constructor function');
+            }
+            
+            let isInstance = this.actual instanceof expected;
+            
+            // Handle primitive types that need special checking
+            if (!isInstance) {
+                if (expected === String && typeof this.actual === 'string') {
+                    isInstance = true;
+                } else if (expected === Number && typeof this.actual === 'number') {
+                    isInstance = true;
+                } else if (expected === Boolean && typeof this.actual === 'boolean') {
+                    isInstance = true;
+                }
+            }
+            
+            const shouldPass = isNegated ? !isInstance : isInstance;
+            
+            if (!shouldPass) {
+                const actualType = this.actual?.constructor?.name || typeof this.actual;
+                const expectedType = expected.name || 'Unknown';
+                const message = isNegated 
+                    ? `Expected ${actualType} not to be an instance of ${expectedType}`
+                    : `Expected ${actualType} to be an instance of ${expectedType}`;
                 throw new Error(message);
             }
         }

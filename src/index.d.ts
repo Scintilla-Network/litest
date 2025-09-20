@@ -93,6 +93,9 @@ export interface ChaiStyleMatchers<T = any> {
   // Array/object matchers
   contain(expected: any): void;
   
+  // Instance matchers
+  readonly instanceOf: (expected: Function) => void;
+  
   // Property matchers
   readonly have: {
     property(property: string | string[], value?: any): void;
@@ -105,6 +108,7 @@ export interface ChaiStyleMatchers<T = any> {
   readonly lessThan: (expected: number) => void;
   readonly lessThanOrEqual: (expected: number) => void;
   readonly closeTo: (expected: number, precision?: number) => void;
+  readonly instanceOf: (expected: Function) => void;
 }
 
 // Expectation interface
@@ -129,6 +133,7 @@ export interface Expectation<T = any> {
   toBeLessThan(expected: number): void;
   toBeLessThanOrEqual(expected: number): void;
   toBeCloseTo(expected: number, precision?: number): void;
+  toBeInstanceOf(expected: Function): void;
 }
 
 export function expect<T = any>(actual: T): Expectation<T>;
