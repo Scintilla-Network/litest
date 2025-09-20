@@ -67,9 +67,52 @@ export namespace suite {
   function for<T>(cases: T[]): (name: string, fn: (testCase: T) => void) => void;
 }
 
+// Chai-style matchers for 'to' property
+export interface ChaiStyleMatchers<T = any> {
+  // Basic equality
+  equal(expected: T): void;
+  be(expected: T): void;
+  
+  // Deep equality
+  readonly deep: {
+    equal(expected: T): void;
+  };
+  
+  // Truthiness
+  readonly truthy: void;
+  readonly falsy: void;
+  readonly null: void;
+  readonly undefined: void;
+  
+  // Function matchers
+  throw(expected?: string | RegExp): void;
+  
+  // String matchers
+  match(expected: string | RegExp): void;
+  
+  // Array/object matchers
+  contain(expected: any): void;
+  
+  // Property matchers
+  readonly have: {
+    property(property: string | string[], value?: any): void;
+    length(expected: number): void;
+  };
+  
+  // Comparison matchers
+  readonly greaterThan: (expected: number) => void;
+  readonly greaterThanOrEqual: (expected: number) => void;
+  readonly lessThan: (expected: number) => void;
+  readonly lessThanOrEqual: (expected: number) => void;
+  readonly closeTo: (expected: number, precision?: number) => void;
+}
+
 // Expectation interface
 export interface Expectation<T = any> {
   readonly not: Expectation<T>;
+  readonly to: ChaiStyleMatchers<T>;
+  
+  // Jest-style matchers
   toEqual(expected: T): void;
   toBe(expected: T): void;
   toBeTruthy(): void;

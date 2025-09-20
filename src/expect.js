@@ -24,6 +24,91 @@ function expect(actual, isNegated = false) {
         },
 
         /**
+         * Chai-style syntax support
+         * @returns {Object} Object with chai-style matchers
+         */
+        get to() {
+            const self = this;
+            return {
+                // Equality matchers
+                equal(expected) {
+                    return self.toEqual(expected);
+                },
+                
+                // Simple be matcher (for backwards compatibility)
+                be(expected) {
+                    return self.toBe(expected);
+                },
+                
+                // Deep equality support
+                get deep() {
+                    return {
+                        equal(expected) {
+                            return self.toEqual(expected);
+                        }
+                    };
+                },
+                
+                // Truthiness matchers
+                get truthy() {
+                    return self.toBeTruthy();
+                },
+                get falsy() {
+                    return self.toBeFalsy();
+                },
+                
+                // Null/undefined matchers
+                get null() {
+                    return self.toBeNull();
+                },
+                get undefined() {
+                    return self.toBeUndefined();
+                },
+                
+                // Function matchers
+                throw(expectedMessage) {
+                    return self.toThrow(expectedMessage);
+                },
+                
+                // String matchers
+                match(expected) {
+                    return self.toMatch(expected);
+                },
+                
+                // Array/object matchers
+                contain(expected) {
+                    return self.toContain(expected);
+                },
+                
+                // Property matchers
+                have: {
+                    property(property, value) {
+                        return self.toHaveProperty(property, value);
+                    },
+                    length(expected) {
+                        return self.toHaveLength(expected);
+                    }
+                },
+                
+                get greaterThan() {
+                    return (expected) => self.toBeGreaterThan(expected);
+                },
+                get greaterThanOrEqual() {
+                    return (expected) => self.toBeGreaterThanOrEqual(expected);
+                },
+                get lessThan() {
+                    return (expected) => self.toBeLessThan(expected);
+                },
+                get lessThanOrEqual() {
+                    return (expected) => self.toBeLessThanOrEqual(expected);
+                },
+                get closeTo() {
+                    return (expected, precision) => self.toBeCloseTo(expected, precision);
+                }
+            };
+        },
+
+        /**
          * Checks if the actual value equals the expected value
          * @param {*} expected - The expected value
          */
