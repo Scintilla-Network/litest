@@ -66,7 +66,9 @@ function formatStackFrame(frame, testFilePath = '') {
             const isTestFile = filePath.includes(testFilePath) || fileName.includes('.spec.') || fileName.includes('.test.');
             
             if (isTestFile) {
-                return `${c.brightBlue(fileName)}:${c.yellow(line)}:${c.yellow(column)}`;
+                // Show full absolute path for test files
+                const absolutePath = path.resolve(filePath.replace('file://', ''));
+                return `${c.brightBlue(absolutePath)}:${c.yellow(line)}:${c.yellow(column)}`;
             } else {
                 return `${c.muted(fileName)}:${c.muted(line)}:${c.muted(column)}`;
             }
@@ -79,7 +81,9 @@ function formatStackFrame(frame, testFilePath = '') {
     const isTestFile = filePath.includes(testFilePath) || fileName.includes('.spec.') || fileName.includes('.test.');
     
     if (isTestFile) {
-        return `${c.brightCyan(functionName)} ${c.brightBlue(fileName)}:${c.yellow(line)}:${c.yellow(column)}`;
+        // Show full absolute path for test files
+        const absolutePath = path.resolve(filePath.replace('file://', ''));
+        return `${c.brightCyan(functionName)} ${c.brightBlue(absolutePath)}:${c.yellow(line)}:${c.yellow(column)}`;
     } else {
         return `${c.muted(functionName)} ${c.muted(fileName)}:${c.muted(line)}:${c.muted(column)}`;
     }

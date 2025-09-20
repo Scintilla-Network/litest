@@ -27,8 +27,8 @@ const __dirname = path.dirname(__filename);
  */
 
 class TestRunner {
-    constructor() {
-        this.reporter = new TestReporter();
+    constructor(options = {}) {
+        this.reporter = new TestReporter(options);
     }
 
     /**
@@ -425,10 +425,8 @@ class TestRunner {
      * @returns {Promise<Object[]>} Array of test results
      */
     async runSpecFile(filePath, showFileHeader = true) {
-        if (showFileHeader) {
-            const relativePath = path.relative(process.cwd(), filePath);
-            console.log(`\n${c.path(relativePath)}`);
-        }
+        // Start file tracking
+        this.reporter.onFileStart(filePath);
         
         try {
             // Reset test context and timeout before loading new file
@@ -448,6 +446,9 @@ class TestRunner {
                 const suiteResults = await this.runSuite(suite, '', context.hasOnly, { beforeEach: [], afterEach: [] });
                 results.push(...suiteResults);
             }
+            
+            // End file tracking
+            this.reporter.onFileEnd(filePath);
             
             return results;
         } catch (error) {
@@ -475,6 +476,9 @@ class TestRunner {
                     console.error(c.muted(`   ${error.stack}`));
                 }
             }
+            
+            // End file tracking even on error
+            this.reporter.onFileEnd(filePath);
             
             return [];
         }
@@ -525,7 +529,7 @@ class TestRunner {
 
 // CLI entry point
 async function runTests(args) {
-    const runner = new TestRunner();
+    const runner = new TestRunner({ verbose: args.verbose });
     
     try {
         if (args.files.length > 0) {

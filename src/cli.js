@@ -42,6 +42,9 @@ ${c.bold('OPTIONS')}
   ${c.green('-v, --version')}  Show version number
   ${c.green('--watch')}        Watch for file changes and rerun tests ${c.dim('(coming soon)')}
   ${c.green('--coverage')}     Generate coverage report ${c.dim('(coming soon)')}
+  ${c.green('--verbose')}      Show detailed test output (default)
+  ${c.green('--compact')}      Show compact output like Vitest
+  ${c.green('--reporter=X')}   Set reporter: verbose, detailed, basic, compact
 
 ${c.bold('EXAMPLES')}
   ${c.green('litest')}                    Run all tests in current directory
@@ -82,16 +85,18 @@ function parseArgs(args) {
         version: false,
         watch: false,
         coverage: false,
+        verbose: true, // Default to verbose (detailed) output
         files: [],
         directories: [],
         patterns: [],
         command: null // Track if a command was used
     };
 
-    // Handle 'run' subcommand
-    if (args.length > 0 && args[0] === 'run') {
+    // Handle 'run' subcommand - check for 'run' anywhere in the arguments
+    const runIndex = args.indexOf('run');
+    if (runIndex !== -1) {
         parsed.command = 'run';
-        args = args.slice(1); // Remove 'run' from args
+        args.splice(runIndex, 1); // Remove 'run' from args
     }
 
     for (let i = 0; i < args.length; i++) {
@@ -111,6 +116,20 @@ function parseArgs(args) {
                 break;
             case '--coverage':
                 parsed.coverage = true;
+                break;
+            case '--reporter=basic':
+            case '--reporter=compact':
+                parsed.verbose = false;
+                break;
+            case '--reporter=verbose':
+            case '--reporter=detailed':
+                parsed.verbose = true;
+                break;
+            case '--compact':
+                parsed.verbose = false;
+                break;
+            case '--verbose':
+                parsed.verbose = true;
                 break;
             default:
                 if (arg.startsWith('-')) {

@@ -1,5 +1,6 @@
 import { c, colorSymbol } from './colors.js';
 import { formatError } from './stack-trace.js';
+import path from 'path';
 
 /**
  * @typedef {Object} TestResult
@@ -22,7 +23,7 @@ import { formatError } from './stack-trace.js';
  */
 
 class TestReporter {
-    constructor() {
+    constructor(options = {}) {
         /** @type {TestResult[]} */
         this.results = [];
         /** @type {TestStats} */
@@ -36,6 +37,10 @@ class TestReporter {
             duration: 0
         };
         this.startTime = 0;
+        this.currentFile = null;
+        this.fileResults = new Map(); // Track results per file
+        this.fileStartTime = 0;
+        this.verbose = options.verbose !== false; // Default to verbose
     }
 
     /**
@@ -44,6 +49,46 @@ class TestReporter {
     onRunStart() {
         this.startTime = Date.now();
         console.log(c.bold('🚀 Running tests...\n'));
+    }
+
+    /**
+     * Called when a file starts running
+     * @param {string} filePath - The path to the file
+     */
+    onFileStart(filePath) {
+        this.currentFile = filePath;
+        this.fileStartTime = Date.now();
+        this.fileResults.set(filePath, {
+            tests: [],
+            stats: {
+                total: 0,
+                passed: 0,
+                failed: 0,
+                skipped: 0,
+                todo: 0,
+                duration: 0
+            }
+        });
+        
+        // Show file header only in verbose mode
+        if (this.verbose) {
+            const relativePath = path.relative(process.cwd(), filePath);
+            console.log(`\n${c.path(relativePath)}`);
+        }
+    }
+
+    /**
+     * Called when a file ends running
+     * @param {string} filePath - The path to the file
+     */
+    onFileEnd(filePath) {
+        if (this.fileResults.has(filePath)) {
+            const fileResult = this.fileResults.get(filePath);
+            fileResult.stats.duration = Date.now() - this.fileStartTime;
+            
+            // Just update the duration, don't print summary yet
+            // We'll print all file summaries in the final summary
+        }
     }
 
     /**
@@ -71,20 +116,41 @@ class TestReporter {
         this.stats.total++;
         this.stats[result.status]++;
 
-        const statusSymbol = this.getStatusSymbol(result.status);
-        const duration = result.duration > 0 ? c.time(` ${result.duration}ms`) : '';
-        
-        if (result.status === 'failed') {
-            console.log(`${statusSymbol} ${result.fullName}${duration}`);
-            const formattedError = formatError(result.error, result.name, result.filePath);
-            console.log(formattedError);
-            console.log('');
-        } else if (result.status === 'skipped') {
-            console.log(`${statusSymbol} ${c.muted(result.fullName)}`);
-        } else if (result.status === 'todo') {
-            console.log(`${statusSymbol} ${c.yellow(result.fullName)} ${c.muted('(todo)')}`);
+        // Track per-file results
+        if (this.currentFile && this.fileResults.has(this.currentFile)) {
+            const fileResult = this.fileResults.get(this.currentFile);
+            fileResult.tests.push(result);
+            fileResult.stats.total++;
+            fileResult.stats[result.status]++;
+        }
+
+        // Show detailed output only in verbose mode
+        if (this.verbose) {
+            const statusSymbol = this.getStatusSymbol(result.status);
+            const duration = c.time(` ${result.duration}ms`); // Always show duration
+            
+            if (result.status === 'failed') {
+                console.log(`${statusSymbol} ${result.fullName}${duration}`);
+                const formattedError = formatError(result.error, result.name, result.filePath);
+                console.log(formattedError);
+                console.log('');
+            } else if (result.status === 'skipped') {
+                console.log(`${statusSymbol} ${c.muted(result.fullName)}`);
+            } else if (result.status === 'todo') {
+                console.log(`${statusSymbol} ${c.yellow(result.fullName)} ${c.muted('(todo)')}`);
+            } else {
+                console.log(`${statusSymbol} ${result.fullName}${duration}`);
+            }
         } else {
-            console.log(`${statusSymbol} ${result.fullName}${duration}`);
+            // In compact mode, only show failures immediately
+            if (result.status === 'failed') {
+                const statusSymbol = this.getStatusSymbol(result.status);
+                const duration = c.time(` ${result.duration}ms`);
+                console.log(`${statusSymbol} ${result.fullName}${duration}`);
+                const formattedError = formatError(result.error, result.name, result.filePath);
+                console.log(formattedError);
+                console.log('');
+            }
         }
     }
 
@@ -105,20 +171,77 @@ class TestReporter {
     }
 
     /**
+     * Prints a Vitest-style file summary
+     * @param {string} filePath - The file path
+     * @param {Object} fileResult - The file results
+     */
+    printFileSummary(filePath, fileResult) {
+        const relativePath = path.relative(process.cwd(), filePath);
+        const stats = fileResult.stats;
+        
+        let statusSymbol, statusColor;
+        if (stats.failed > 0) {
+            statusSymbol = '✗';
+            statusColor = c.red;
+        } else if (stats.total === stats.skipped) {
+            statusSymbol = '↓';
+            statusColor = c.cyan;
+        } else {
+            statusSymbol = '✓';
+            statusColor = c.green;
+        }
+        
+        const testCount = `(${stats.total} test${stats.total === 1 ? '' : 's'})`;
+        const duration = stats.duration > 0 ? ` ${stats.duration}ms` : '';
+        const skippedInfo = stats.skipped > 0 ? ` | ${stats.skipped} skipped` : '';
+        
+        console.log(`${statusColor(statusSymbol)} ${relativePath} ${testCount}${skippedInfo}${c.time(duration)}`);
+    }
+
+    /**
      * Prints the test run summary
      */
     printSummary() {
         console.log('');
         
-        const testFiles = this.getUniqueFileCount();
-        console.log(c.bold(`Test Files  ${c.number(testFiles)} passed (${testFiles})`));
+        // First, show Vitest-style file summaries
+        for (const [filePath, fileResult] of this.fileResults) {
+            this.printFileSummary(filePath, fileResult);
+        }
         
-        let testsLine = `Tests  ${c.number(this.stats.passed)} passed`;
+        console.log('');
+        
+        // Count files by status
+        let passedFiles = 0;
+        let failedFiles = 0;
+        let totalFiles = this.fileResults.size;
+        
+        for (const [, fileResult] of this.fileResults) {
+            if (fileResult.stats.failed > 0) {
+                failedFiles++;
+            } else {
+                passedFiles++;
+            }
+        }
+        
+        // File summary
+        if (failedFiles > 0) {
+            console.log(c.bold(`Test Files  ${c.number(failedFiles)} failed | ${c.number(passedFiles)} passed (${totalFiles})`));
+        } else {
+            console.log(c.bold(`Test Files  ${c.number(passedFiles)} passed (${totalFiles})`));
+        }
+        
+        // Test summary
+        let testsLine = '';
+        if (this.stats.failed > 0) {
+            testsLine += `${c.number(this.stats.failed)} failed | `;
+        }
+        testsLine += `${c.number(this.stats.passed)} passed`;
         if (this.stats.skipped > 0) {
             testsLine += ` | ${c.number(this.stats.skipped)} skipped`;
         }
         testsLine += ` (${c.number(this.stats.total)})`;
-        console.log(c.bold(`     ${testsLine}`));
+        console.log(c.bold(`     Tests  ${testsLine}`));
         
         const durationFormatted = this.formatDuration(this.stats.duration);
         console.log(c.muted(`Duration  ${durationFormatted}`));
