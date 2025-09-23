@@ -1,6 +1,6 @@
 {
   "name": "@scintilla-network/litest",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Dependency-free test framework with full Vitest API compatibility. Zero-dependency replacement for Vitest to reduce risk of supply chain attacks.",
   "main": "src/index.js",
   "type": "module",
@@ -54,28 +54,19 @@
     "test-framework",
     "javascript-testing",
     "nodejs-testing",
-    "esm",
-    "es-modules",
     "zero-dependency",
     "no-dependencies",
-    "security",
-    "supply-chain-security",
     "lightweight",
     "fast",
     "simple",
-    "cli",
-    "command-line",
-    "parameterized-testing",
     "test-hooks",
     "lifecycle-hooks",
     "test-timeout",
     "test-retry",
     "nested-suites",
-    "test-modifiers",
     "skip",
     "only",
-    "fails",
-    "dependency-free"
+    "fails"
   ],
   "engines": {
     "node": ">=14.0.0"
