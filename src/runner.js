@@ -296,6 +296,12 @@ class TestRunner {
                             try {
                                 await hook();
                             } catch (hookError) {
+                                if (hookError.stack) {
+                                    const stackLines = hookError.stack.split('\n').slice(0, 3);
+                                    stackLines.forEach(line => {
+                                        console.error(c.muted(`   ${line.trim()}`));
+                                    });
+                                }
                                 throw new Error(`beforeEach hook failed: ${hookError.message}`);
                             }
                         }
