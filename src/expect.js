@@ -1,3 +1,4 @@
+import { stringify } from './stringify.js';
 /**
  * @typedef {Object} Expectation
  * @property {*} actual - The actual value being tested
@@ -136,8 +137,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to equal ${JSON.stringify(expected)}`
-                    : `Expected ${JSON.stringify(this.actual)} to equal ${JSON.stringify(expected)}`;
+                    ? `Expected ${stringify(this.actual)} not to equal ${stringify(expected)}`
+                    : `Expected ${stringify(this.actual)} to equal ${stringify(expected)}`;
                 throw new Error(message);
             }
         },
@@ -152,8 +153,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be ${JSON.stringify(expected)}`
-                    : `Expected ${JSON.stringify(this.actual)} to be ${JSON.stringify(expected)}`;
+                    ? `Expected ${stringify(this.actual)} not to be ${stringify(expected)}`
+                    : `Expected ${stringify(this.actual)} to be ${stringify(expected)}`;
                 throw new Error(message);
             }
         },
@@ -167,8 +168,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be truthy`
-                    : `Expected ${JSON.stringify(this.actual)} to be truthy`;
+                    ? `Expected ${stringify(this.actual)} not to be truthy`
+                    : `Expected ${stringify(this.actual)} to be truthy`;
                 throw new Error(message);
             }
         },
@@ -182,8 +183,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be falsy`
-                    : `Expected ${JSON.stringify(this.actual)} to be falsy`;
+                    ? `Expected ${stringify(this.actual)} not to be falsy`
+                    : `Expected ${stringify(this.actual)} to be falsy`;
                 throw new Error(message);
             }
         },
@@ -242,8 +243,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be null`
-                    : `Expected ${JSON.stringify(this.actual)} to be null`;
+                    ? `Expected ${stringify(this.actual)} not to be null`
+                    : `Expected ${stringify(this.actual)} to be null`;
                 throw new Error(message);
             }
         },
@@ -257,8 +258,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be undefined`
-                    : `Expected ${JSON.stringify(this.actual)} to be undefined`;
+                    ? `Expected ${stringify(this.actual)} not to be undefined`
+                    : `Expected ${stringify(this.actual)} to be undefined`;
                 throw new Error(message);
             }
         },
@@ -272,8 +273,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to be defined`
-                    : `Expected ${JSON.stringify(this.actual)} to be defined`;
+                    ? `Expected ${stringify(this.actual)} not to be defined`
+                    : `Expected ${stringify(this.actual)} to be defined`;
                 throw new Error(message);
             }
         },
@@ -325,8 +326,8 @@ function expect(actual, isNegated = false) {
             
             if (!shouldPass) {
                 const message = isNegated 
-                    ? `Expected ${JSON.stringify(this.actual)} not to contain ${JSON.stringify(expected)}`
-                    : `Expected ${JSON.stringify(this.actual)} to contain ${JSON.stringify(expected)}`;
+                    ? `Expected ${stringify(this.actual)} not to contain ${stringify(expected)}`
+                    : `Expected ${stringify(this.actual)} to contain ${stringify(expected)}`;
                 throw new Error(message);
             }
         },
@@ -366,8 +367,8 @@ function expect(actual, isNegated = false) {
                 
                 if (value !== undefined) {
                     message = isNegated 
-                        ? `Expected object not to have property "${propertyStr}" with value ${JSON.stringify(value)}`
-                        : `Expected object to have property "${propertyStr}" with value ${JSON.stringify(value)}`;
+                        ? `Expected object not to have property "${propertyStr}" with value ${stringify(value)}`
+                        : `Expected object to have property "${propertyStr}" with value ${stringify(value)}`;
                 } else {
                     message = isNegated 
                         ? `Expected object not to have property "${propertyStr}"`
